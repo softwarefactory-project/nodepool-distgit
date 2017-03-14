@@ -1,0 +1,20 @@
+elements-dir: /etc/nodepool/elements
+script-dir: /etc/nodepool/scripts
+images-dir: /var/lib/nodepool/images/
+
+cron:
+  image-update: '14 2 * * *'
+  cleanup: '*/30 * * * *'
+  check: '*/15 * * * *'
+
+zmq-publishers: []
+
+gearman-servers: []
+
+labels: []
+
+providers: []
+
+targets: []
+
+diskimages: []
