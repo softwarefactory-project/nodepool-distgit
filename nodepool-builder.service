@@ -1,0 +1,13 @@
+[Unit]
+Description=Nodepool Builder Service
+After=network.target
+
+[Service]
+Type=simple
+User=nodepool
+Group=nodepool
+EnvironmentFile=-/etc/sysconfig/nodepool-builder
+ExecStart=/usr/bin/nodepool-builder -d -l /etc/nodepool/builder-logging.conf
+
+[Install]
+WantedBy=multi-user.target

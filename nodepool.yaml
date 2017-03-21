@@ -1,6 +1,6 @@
 elements-dir: /etc/nodepool/elements
 script-dir: /etc/nodepool/scripts
-images-dir: /var/lib/nodepool/images/
+images-dir: /var/lib/nodepool/dib
 
 cron:
   image-update: '14 2 * * *'
@@ -9,7 +9,8 @@ cron:
 
 zmq-publishers: []
 
-gearman-servers: []
+gearman-servers:
+  - host: localhost
 
 labels: []
 
