@@ -3,7 +3,7 @@
 
 Name:           nodepool
 Version:        0.4.0
-Release:        2.20160617.fb8bda3%{?dist}
+Release:        3.20160617.fb8bda3%{?dist}
 Summary:        Node pool management for a distributed test infrastructure
 
 License:        ASL 2.0
@@ -168,6 +168,9 @@ exit 0
 /usr/share/nodepool/
 
 %changelog
+* Tue Mar 28 2017 Tristan Cacqueray - 0.3.1-3
+- Disable image build on nodepoold service
+
 * Tue Mar 21 2017 Tristan Cacqueray - 0.3.1-2
 - Add builder service
 
