@@ -7,7 +7,7 @@ Type=simple
 User=nodepool
 Group=nodepool
 EnvironmentFile=-/etc/sysconfig/nodepool
-ExecStart=/usr/bin/nodepoold -d -l /etc/nodepool/logging.conf
+ExecStart=/usr/bin/nodepoold -d -l /etc/nodepool/logging.conf --no-builder
 
 [Install]
 WantedBy=multi-user.target

@@ -168,6 +168,9 @@ exit 0
 /usr/share/nodepool/
 
 %changelog
+* Tue Mar 28 2017 Tristan Cacqueray - 0.3.1-3
+- Disable image build on nodepoold service
+
 * Tue Mar 21 2017 Tristan Cacqueray - 0.3.1-2
 - Add builder service
 
