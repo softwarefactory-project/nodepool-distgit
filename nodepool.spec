@@ -3,7 +3,7 @@
 
 Name:           nodepool
 Version:        0.4.0
-Release:        3.20160617.fb8bda3%{?dist}
+Release:        4.20160617.fb8bda3%{?dist}
 Summary:        Node pool management for a distributed test infrastructure
 
 License:        ASL 2.0
@@ -38,7 +38,7 @@ Requires:       python-six
 Requires:       python2-os-client-config
 Requires:       python2-shade
 Requires:       diskimage-builder
-Requires:       python2-voluptuous
+Requires:       python-voluptuous
 
 
 BuildRequires:  python2-devel
@@ -168,11 +168,14 @@ exit 0
 /usr/share/nodepool/
 
 %changelog
-* Tue Mar 28 2017 Tristan Cacqueray - 0.3.1-3
+* Thu Mar 30 2017 Tristan Cacqueray - 0.4.0-4
+- Depends on python-voluptuous from rdo
+
+* Tue Mar 28 2017 Tristan Cacqueray - 0.4.0-3
 - Disable image build on nodepoold service
 
-* Tue Mar 21 2017 Tristan Cacqueray - 0.3.1-2
+* Tue Mar 21 2017 Tristan Cacqueray - 0.4.0-2
 - Add builder service
 
-* Tue Mar 14 2017 Tristan Cacqueray - 0.3.1-1
+* Tue Mar 14 2017 Tristan Cacqueray - 0.4.0-1
 - Initial packaging
