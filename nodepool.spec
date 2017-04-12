@@ -3,7 +3,7 @@
 
 Name:           nodepool
 Version:        0.4.0
-Release:        4.20160617.fb8bda3%{?dist}
+Release:        5.20160617.fb8bda3%{?dist}
 Summary:        Node pool management for a distributed test infrastructure
 
 License:        ASL 2.0
@@ -18,6 +18,8 @@ Source12:       logging.conf
 Source13:       builder-logging.conf
 Source14:       sudoer
 Source20:       sysconfig
+
+Patch0:         0001-Add-destructor-to-SSHClient.patch
 
 BuildArch:      noarch
 
@@ -78,7 +80,7 @@ Nodepool infra elements
 
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -n %{name}-%{commit} -p1
 gzip -dc %{SOURCE1} | tar -xvf -
 rm requirements.txt test-requirements.txt
 
@@ -168,6 +170,9 @@ exit 0
 /usr/share/nodepool/
 
 %changelog
+* Wed Apr 12 2017 Tristan Cacqueray - 0.4.0-5
+- Cherry-pick fix for paramiko client close
+
 * Thu Mar 30 2017 Tristan Cacqueray - 0.4.0-4
 - Depends on python-voluptuous from rdo
 

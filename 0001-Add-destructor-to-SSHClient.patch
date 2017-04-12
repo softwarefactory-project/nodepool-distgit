@@ -1,0 +1,47 @@
+From fbe9866f74abd515bf4aa32ff2a927482f013256 Mon Sep 17 00:00:00 2001
+From: "James E. Blair" <jeblair@redhat.com>
+Date: Tue, 28 Feb 2017 15:47:00 -0800
+Subject: [PATCH] Add destructor to SSHClient
+
+Newer versions of paramiko require a client object to be explicitly
+closed.  Fortunately, we wrap all of our use of paramiko client
+objects in our own class.  Add a destructor to our class which
+closes the client object.
+
+Note, this has been tested to work (and is needed) even if a
+connection is not established.
+
+Change-Id: I5dff7ed254567968b42d053b85004769f8647ecb
+(cherry-picked from d616e61723207ed0e29ea69d67908a00ebf2cdfb)
+---
+ nodepool/sshclient.py | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/nodepool/sshclient.py b/nodepool/sshclient.py
+index d41990d..2832e40 100644
+--- a/nodepool/sshclient.py
++++ b/nodepool/sshclient.py
+@@ -24,13 +24,15 @@ import paramiko
+ class SSHClient(object):
+     def __init__(self, ip, username, password=None, pkey=None,
+                  key_filename=None, log=None):
+-        client = paramiko.SSHClient()
+-        client.set_missing_host_key_policy(paramiko.WarningPolicy())
+-        client.connect(ip, username=username, password=password, pkey=pkey,
+-                       key_filename=key_filename)
+-        self.client = client
++        self.client = paramiko.SSHClient()
++        self.client.set_missing_host_key_policy(paramiko.WarningPolicy())
++        self.client.connect(ip, username=username, password=password,
++                            pkey=pkey, key_filename=key_filename)
+         self.log = log
+ 
++    def __del__(self):
++        self.client.close()
++
+     def ssh(self, action, command, get_pty=True, output=False):
+         if self.log:
+             self.log.debug("*** START to %s" % action)
+-- 
+2.10.2
+
