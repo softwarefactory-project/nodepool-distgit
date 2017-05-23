@@ -3,14 +3,14 @@
 
 Name:           nodepool
 Version:        0.4.0
-Release:        5.20160617.fb8bda3%{?dist}
+Release:        6.20160617.fb8bda3%{?dist}
 Summary:        Node pool management for a distributed test infrastructure
 
 License:        ASL 2.0
 URL:            http://docs.openstack.org/infra/system-config/
 Source0:        https://github.com/openstack-infra/nodepool/archive/%{commit}.tar.gz
 Source1:        https://github.com/openstack-infra/project-config/archive/%{elements}.tar.gz
-Source2:        nodepool.service
+Source2:        nodepool-launcher.service
 Source3:        nodepool-builder.service
 Source10:       nodepool.yaml
 Source11:       secure.conf
@@ -57,8 +57,17 @@ of devstack images on a cloud server for use in OpenStack project testing.
 %package -n nodepoold
 Summary:        Nodepoold service
 Requires:       nodepool
+Requires:       nodepool-launcher
 
 %description -n nodepoold
+Nodepoold service
+
+
+%package launcher
+Summary:        Nodepoold service
+Requires:       nodepool
+
+%description launcher
 Nodepoold service
 
 
@@ -92,6 +101,7 @@ PBR_VERSION=%{version} %{__python2} setup.py build
 %install
 PBR_VERSION=%{version} %{__python2} setup.py install --skip-build --root %{buildroot}
 install -p -D -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/nodepool.service
+install -p -D -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/nodepool-launcher.service
 install -p -D -m 0644 %{SOURCE3} %{buildroot}%{_unitdir}/nodepool-builder.service
 install -p -D -m 0644 %{SOURCE10} %{buildroot}%{_sysconfdir}/nodepool/nodepool.yaml
 install -p -D -m 0640 %{SOURCE11} %{buildroot}%{_sysconfdir}/nodepool/secure.conf
@@ -125,16 +135,22 @@ exit 0
 
 %post -n nodepoold
 %systemd_post nodepool.service
+%post launcher
+%systemd_post nodepool-launcher.service
 %post builder
 %systemd_post nodepool-builder.service
 
 %preun -n nodepoold
 %systemd_preun nodepool.service
+%preun launcher
+%systemd_preun nodepool-launcher.service
 %preun builder
 %systemd_preun nodepool-builder.service
 
 %postun -n nodepoold
 %systemd_postun_with_restart nodepool.service
+%postun launcher
+%systemd_postun_with_restart nodepool-launcher.service
 %postun builder
 %systemd_postun_with_restart nodepool-builder.service
 
@@ -153,8 +169,11 @@ exit 0
 %{python2_sitelib}/nodepool-*.egg-info
 
 %files -n nodepoold
-%{_bindir}/nodepoold
 %{_unitdir}/nodepool.service
+
+%files launcher
+%{_bindir}/nodepoold
+%{_unitdir}/nodepool-launcher.service
 %config(noreplace) %{_sysconfdir}/sysconfig/nodepool
 %dir %attr(0755, nodepool, nodepool) %{_var}/run/nodepool
 
@@ -170,6 +189,9 @@ exit 0
 /usr/share/nodepool/
 
 %changelog
+* Tue May 23 2017 Tristan Cacqueray <tdecacqu@redhat.com> - 0.4.0-6
+- Add nodepool-launcher systemd unit (while keeping the 'nodepool' one for retro compat)
+
 * Wed Apr 12 2017 Tristan Cacqueray - 0.4.0-5
 - Cherry-pick fix for paramiko client close
 
