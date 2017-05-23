@@ -3,7 +3,7 @@
 
 Name:           nodepool
 Version:        0.4.0
-Release:        6.20160617.fb8bda3%{?dist}
+Release:        7.20160617.fb8bda3%{?dist}
 Summary:        Node pool management for a distributed test infrastructure
 
 License:        ASL 2.0
@@ -54,15 +54,6 @@ Nodepool is a service used by the OpenStack CI team to deploy and manage a pool
 of devstack images on a cloud server for use in OpenStack project testing.
 
 
-%package -n nodepoold
-Summary:        Nodepoold service
-Requires:       nodepool
-Requires:       nodepool-launcher
-
-%description -n nodepoold
-Nodepoold service
-
-
 %package launcher
 Summary:        Nodepoold service
 Requires:       nodepool
@@ -100,7 +91,6 @@ PBR_VERSION=%{version} %{__python2} setup.py build
 
 %install
 PBR_VERSION=%{version} %{__python2} setup.py install --skip-build --root %{buildroot}
-install -p -D -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/nodepool.service
 install -p -D -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/nodepool-launcher.service
 install -p -D -m 0644 %{SOURCE3} %{buildroot}%{_unitdir}/nodepool-builder.service
 install -p -D -m 0644 %{SOURCE10} %{buildroot}%{_sysconfdir}/nodepool/nodepool.yaml
@@ -133,22 +123,16 @@ fi
 exit 0
 
 
-%post -n nodepoold
-%systemd_post nodepool.service
 %post launcher
 %systemd_post nodepool-launcher.service
 %post builder
 %systemd_post nodepool-builder.service
 
-%preun -n nodepoold
-%systemd_preun nodepool.service
 %preun launcher
 %systemd_preun nodepool-launcher.service
 %preun builder
 %systemd_preun nodepool-builder.service
 
-%postun -n nodepoold
-%systemd_postun_with_restart nodepool.service
 %postun launcher
 %systemd_postun_with_restart nodepool-launcher.service
 %postun builder
@@ -168,9 +152,6 @@ exit 0
 %{python2_sitelib}/nodepool
 %{python2_sitelib}/nodepool-*.egg-info
 
-%files -n nodepoold
-%{_unitdir}/nodepool.service
-
 %files launcher
 %{_bindir}/nodepoold
 %{_unitdir}/nodepool-launcher.service
@@ -188,7 +169,11 @@ exit 0
 %files elements
 /usr/share/nodepool/
 
+
 %changelog
+* Tue May 23 2017 Tristan Cacqueray <tdecacqu@redhat.com> - 0.4.0-7
+- Remove nodepoold
+
 * Tue May 23 2017 Tristan Cacqueray <tdecacqu@redhat.com> - 0.4.0-6
 - Add nodepool-launcher systemd unit (while keeping the 'nodepool' one for retro compat)
 
