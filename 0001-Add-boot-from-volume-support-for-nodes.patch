@@ -1,0 +1,151 @@
+From 142b3d112e2874ec7c792399deb7601a616ccb40 Mon Sep 17 00:00:00 2001
+From: Paul Belanger <pabelanger@redhat.com>
+Date: Fri, 12 May 2017 21:57:58 -0400
+Subject: [PATCH] Add boot-from-volume support for nodes
+
+For example, a cloud may get better preformance from a cinder volume
+then the local compute drive. As a result, give nodepool to option to
+choose if the server should boot from volume or not.
+
+Change-Id: I3faefe99096fef1fe28816ac0a4b28c05ff7f0ec
+Depends-On: If58cd96b0b9ce4569120d60fbceb2c23b2f7641d
+Signed-off-by: Paul Belanger <pabelanger@redhat.com>
+---
+ doc/source/configuration.rst                      | 11 +++++++++++
+ nodepool/cmd/config_validator.py                  |  2 ++
+ nodepool/config.py                                |  2 ++
+ nodepool/nodepool.py                              |  8 ++++++--
+ nodepool/provider_manager.py                      |  8 +++++++-
+ nodepool/tests/fixtures/config_validate/good.yaml |  2 ++
+ requirements.txt                                  |  2 +-
+ 7 files changed, 31 insertions(+), 4 deletions(-)
+
+diff --git a/doc/source/configuration.rst b/doc/source/configuration.rst
+index 7861904..06dd741 100644
+--- a/doc/source/configuration.rst
++++ b/doc/source/configuration.rst
+@@ -558,6 +558,17 @@ Example configuration::
+     metadata service. A maximum of five entries is allowed, and both keys and
+     values must be 255 characters or less.
+ 
++  ``boot-from-volume`` (bool)
++    If given, the label for use in this pool will create a volume from the
++    image and boot the node from it.
++
++    Default: False
++
++  ``volume-size``
++    When booting an image from volume, how big should the created volume be.
++
++    In gigabytes. Default 50.
++
+ .. _targets:
+ 
+ targets
+diff --git a/nodepool/cmd/config_validator.py b/nodepool/cmd/config_validator.py
+index 0409e0a..171b055 100644
+--- a/nodepool/cmd/config_validator.py
++++ b/nodepool/cmd/config_validator.py
+@@ -36,6 +36,8 @@ class ConfigValidator:
+             'name-filter': str,
+             'key-name': str,
+             'diskimage': str,
++            'boot-from-volume': bool,
++            'volume-size': int,
+             'meta': dict,
+             'username': str,
+             'user-home': str,
+diff --git a/nodepool/config.py b/nodepool/config.py
+index c944013..a740997 100644
+--- a/nodepool/config.py
++++ b/nodepool/config.py
+@@ -243,6 +243,8 @@ def loadConfig(config_path):
+             i.private_key = image.get('private-key',
+                                       '/var/lib/jenkins/.ssh/id_rsa')
+             i.config_drive = image.get('config-drive', True)
++            i.boot_from_volume = bool(image.get('boot-from-volume', False))
++            i.volume_size = image.get('volume-size', 50)
+ 
+             # This dict is expanded and used as custom properties when
+             # the image is uploaded.
+diff --git a/nodepool/nodepool.py b/nodepool/nodepool.py
+index ed45d6a..186aff8 100644
+--- a/nodepool/nodepool.py
++++ b/nodepool/nodepool.py
+@@ -482,7 +482,9 @@ class NodeLauncher(threading.Thread):
+             key_name=self.image.key_name,
+             config_drive=self.image.config_drive,
+             nodepool_node_id=self.node_id,
+-            nodepool_image_name=self.image.name)
++            nodepool_image_name=self.image.name,
++            boot_from_volume=self.image.boot_from_volume,
++            volume_size=self.image.volume_size)
+         server_id = server['id']
+         self.node.external_id = server_id
+         session.commit()
+@@ -807,7 +809,9 @@ class SubNodeLauncher(threading.Thread):
+             key_name=self.image.key_name,
+             config_drive=self.image.config_drive,
+             nodepool_node_id=self.node_id,
+-            nodepool_image_name=self.image.name)
++            nodepool_image_name=self.image.name,
++            boot_from_volume=self.image.boot_from_volume,
++            volume_size=self.image.volume_size)
+         server_id = server['id']
+         self.subnode.external_id = server_id
+         session.commit()
+diff --git a/nodepool/provider_manager.py b/nodepool/provider_manager.py
+index 13e7cbb..f39e0e8 100644
+--- a/nodepool/provider_manager.py
++++ b/nodepool/provider_manager.py
+@@ -170,7 +170,8 @@ class ProviderManager(object):
+                      az=None, key_name=None, name_filter=None,
+                      config_drive=True, nodepool_node_id=None,
+                      nodepool_image_name=None,
+-                     nodepool_snapshot_image_id=None):
++                     nodepool_snapshot_image_id=None,
++                     boot_from_volume=False, volume_size=50):
+         if image_name:
+             image = self.findImage(image_name)
+         else:
+@@ -180,6 +181,11 @@ class ProviderManager(object):
+                            image=image,
+                            flavor=flavor,
+                            config_drive=config_drive)
++        if boot_from_volume:
++            create_args['boot_from_volume'] = boot_from_volume
++            create_args['volume_size'] = volume_size
++            # NOTE(pabelanger): Always cleanup volumes when we delete a server.
++            create_args['terminate_volume'] = True
+         if key_name:
+             create_args['key_name'] = key_name
+         if az:
+diff --git a/nodepool/tests/fixtures/config_validate/good.yaml b/nodepool/tests/fixtures/config_validate/good.yaml
+index 921e346..d9146b6 100644
+--- a/nodepool/tests/fixtures/config_validate/good.yaml
++++ b/nodepool/tests/fixtures/config_validate/good.yaml
+@@ -57,6 +57,8 @@ providers:
+         username: jenkins
+         user-home: /home/jenkins
+         private-key: /home/nodepool/.ssh/id_rsa
++        boot-from-volume: True
++        volume-size: 100
+   - name: cloud2
+     region-name: 'chocolate'
+     service-type: 'compute'
+diff --git a/requirements.txt b/requirements.txt
+index d5658af..cf26351 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -15,7 +15,7 @@ PrettyTable>=0.6,<0.8
+ # shade has a looser requirement on six than nodepool, so install six first
+ six>=1.7.0
+ os-client-config>=1.2.0
+-shade>=1.12.0
++shade>=1.21.0
+ diskimage-builder>=1.21.0
+ voluptuous
+ kazoo
+-- 
+2.10.2
+

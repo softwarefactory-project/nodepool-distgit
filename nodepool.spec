@@ -1,9 +1,9 @@
-%global commit  fb8bda31a30ee03a65707c230214abe411530e29
+%global commit  1cb82d6313bbc2f1843ce1b2d1903e796ac2c9a0
 %global elements f0e234d309cf6ede50f0689b65b18bcdad25f96f
 
 Name:           nodepool
 Version:        0.4.0
-Release:        7.20160617.fb8bda3%{?dist}
+Release:        8.20170515.1cb82d6%{?dist}
 Summary:        Node pool management for a distributed test infrastructure
 
 License:        ASL 2.0
@@ -19,7 +19,7 @@ Source13:       builder-logging.conf
 Source14:       sudoer
 Source20:       sysconfig
 
-Patch0:         0001-Add-destructor-to-SSHClient.patch
+Patch0:         0001-Add-boot-from-volume-support-for-nodes.patch
 
 BuildArch:      noarch
 
@@ -41,6 +41,9 @@ Requires:       python2-os-client-config
 Requires:       python2-shade
 Requires:       diskimage-builder
 Requires:       python-voluptuous
+Requires:       python-kazoo
+Requires:       python-paste
+Requires:       python-webob
 
 
 BuildRequires:  python2-devel
@@ -171,6 +174,9 @@ exit 0
 
 
 %changelog
+* Mon Jun 05 2017 Tristan Cacqueray <tdecacqu@redhat.com> - 0.4.0-8
+- Bump to latest master, dropping snapshot image and introducing zookeeper service
+
 * Tue May 23 2017 Tristan Cacqueray <tdecacqu@redhat.com> - 0.4.0-7
 - Remove nodepoold
 
