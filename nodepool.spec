@@ -3,7 +3,7 @@
 
 Name:           nodepool
 Version:        0.4.0
-Release:        8.20170515.1cb82d6%{?dist}
+Release:        9.20170515.1cb82d6%{?dist}
 Summary:        Node pool management for a distributed test infrastructure
 
 License:        ASL 2.0
@@ -68,6 +68,7 @@ Nodepoold service
 %package builder
 Summary:        Nodepool builder service
 Requires:       nodepool
+Requires:       parted
 Requires:       yum-utils
 Requires:       sudo
 
@@ -174,6 +175,9 @@ exit 0
 
 
 %changelog
+* Tue Jun 27 2017 Tristan Cacqueray <tdecacqu@redhat.com> - 0.4.0-9
+- Add parted as builder requirements
+
 * Mon Jun 05 2017 Tristan Cacqueray <tdecacqu@redhat.com> - 0.4.0-8
 - Bump to latest master, dropping snapshot image and introducing zookeeper service
 
