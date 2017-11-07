@@ -1,9 +1,9 @@
-%global commit  1cb82d6313bbc2f1843ce1b2d1903e796ac2c9a0
+%global commit  56e0172805524d464ecb59285f9053ffdbfe3487
 %global elements f0e234d309cf6ede50f0689b65b18bcdad25f96f
 
 Name:           nodepool
 Version:        0.4.0
-Release:        9.20170515.1cb82d6%{?dist}
+Release:        10.20170713.56e0172%{?dist}
 Summary:        Node pool management for a distributed test infrastructure
 
 License:        ASL 2.0
@@ -175,6 +175,9 @@ exit 0
 
 
 %changelog
+* Tue Nov 7 2017 David Moreau Simard <dmsimard@redhat.com> - 0.4.0-10
+- Bump to a more recent commit in master, allowing jenkins SSH slaves update
+
 * Tue Jun 27 2017 Tristan Cacqueray <tdecacqu@redhat.com> - 0.4.0-9
 - Add parted as builder requirements
 
