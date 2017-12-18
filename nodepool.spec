@@ -3,7 +3,7 @@
 
 Name:           nodepool
 Version:        0.4.0
-Release:        10.20170713.56e0172%{?dist}
+Release:        11.20170713.56e0172%{?dist}
 Summary:        Node pool management for a distributed test infrastructure
 
 License:        ASL 2.0
@@ -27,7 +27,7 @@ Requires:       python-pbr
 Requires:       python-gear
 Requires:       PyYAML
 Requires:       python-jenkins
-Requires:       python2-paramiko
+Requires:       python-paramiko
 Requires:       python-daemon
 Requires:       python-extras
 Requires:       python2-statsd
@@ -175,6 +175,9 @@ exit 0
 
 
 %changelog
+* Mon Dec 18 2017 Tristan Cacqueray <tdecacqu@redhat.com> - 0.4.0-11
+- Switch requirement to python-paramiko instead of python2-paramiko
+
 * Tue Nov 7 2017 David Moreau Simard <dmsimard@redhat.com> - 0.4.0-10
 - Bump to a more recent commit in master, allowing jenkins SSH slaves update
 
